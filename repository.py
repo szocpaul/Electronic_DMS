@@ -18,48 +18,57 @@ The paths.ini file contains the (relative or absolute) paths of mentioned subdir
 The roles.txt contains the user names and the list of assigned roles.
 """
 
-from datetime import datetime
+# from datetime import datetime
 import os
+import shutil
 
-from iniformat.writer import write_ini_file
+
+def get_instance(configuration):
+    return Repository(configuration)
 
 
 class Repository(object):
     """Represents the document management system as a repository"""
 
-    def __init__(self, name, location):
-        self._name = name
-        self._location = location
-        self.load()
+    def __init__(self, configuration):
+        if "repository" not in configuration:
+            raise KeyError("repository not found in configuration")
+        if "location" not in configuration['repository']:
+            raise KeyError("repository.location is not configured")
+        self.base = configuration['repository']['location']
 
-    def load(self):
+
+class DocumentManager(Repository):
+    def get_dir(self, uuid, documents="Documents"):
+        return self.base + "/" + str(uuid) + "/" + documents + "/"
+
+    def load(self, uuid, documents, file_path):
         """Try to load an existing repository"""
-        if os.path.exists(self._location):
-            if os.path.isdir(self._location):
-                pass
-            else:
-                raise ValueError('The repository should be a directory!')
+        directory = self.get_dir(uuid, documents)
+        print(directory)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        shutil.copy2(file_path, directory)
+
+    def save(self, uuid, documents, _file, file_name):
+        directory = self.get_dir(uuid, documents)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        target = os.path.join(directory, file_name)
+        _file.save(target)
+
+    def get(self, uuid, documents, _file=None, basename_only=False):
+        result = []
+        directory = self.get_dir(documents, uuid)
+        for (dir_path, dir_names, file_names) in os.walk(directory):
+            result = file_names
+            break
+        if basename_only:
+            prefix = ""
         else:
-            self.initialize()
-
-    def initialize(self):
-        """Initialize a new repository"""
-        os.makedirs(self._location)
-        for dir_name in ['documents', 'logs', 'projects', 'users']:
-            os.makedirs('{}/{}'.format(self._location, dir_name))
-        role_file_path = '{}/roles.txt'.format(self._location)
-        with open(role_file_path, 'w') as role_file:
-            os.utime(role_file_path, None)
-        self.create_default_path_file()
-        self._creation_date = datetime.now()
-
-    def create_default_path_file(self):
-        data = {
-            'directories': {
-                'documents': 'documents',
-                'logs': 'logs',
-                'projects': 'projects',
-                'users': 'users'
-            }
-        }
-        write_ini_file('{}/paths.ini'.format(self._location), data)
+            prefix = directory
+        if _file is not None:
+            if _file in result:
+                return prefix + _file
+            return None
+        return [prefix + r for r in result]
