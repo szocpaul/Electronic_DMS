@@ -1,14 +1,40 @@
+import uuid as uuidlib
+import datetime
+
+
 class Document(object):
     """Document of the repository"""
 
-    def __init__(self, title, description, author, files, doc_format):
-        self._title = title
-        self._description = description
-        self._author = author
-        self._files = files
-        self._doc_format = doc_format
-        self._state = 'new'
-        self._is_public = False
+    def __init__(self,
+                 uuid=None,
+                 title="",
+                 creation_date=None,
+                 document_date=None,
+                 authors=set(),
+                 description="",
+                 in_database=False):
+        if uuid is None:
+            self.uuid = uuidlib.uuid4()
+        else:
+            self.uuid = uuid
+        self.title = title
+        if creation_date is None:
+            self.creation_date = datetime.date.today()
+        else:
+            self.document_date = creation_date
+        if document_date is None:
+            self.document_date = datetime.date.today()
+        else:
+            self.document_date = document_date
+        self.authors = authors
+        self.description = description
+        self.in_database = in_database
+
+    def add_author(self, author):
+        return self.authors.add(author)
+
+    def remove_author(self, author):
+        return self.authors.remove(author)
 
     @property
     def title(self):
@@ -25,14 +51,6 @@ class Document(object):
     @description.setter
     def description(self, value):
         self._description = value
-
-    @property
-    def author(self):
-        return self._author
-
-    @author.setter
-    def author(self, value):
-        self._author = value
 
     @property
     def files(self):
@@ -52,11 +70,11 @@ class Document(object):
             self._state = value
         else:
             raise ValueError('The "{}" is an invalid document state!'.format(value))
-    
+
     @property
     def doc_format(self):
         return self._doc_format
-    
+
     @doc_format.setter
     def doc_format(self, value):
         self._doc_format = value
@@ -85,4 +103,3 @@ class DocumentManager(object):
 
     def remove_document(self, document_id):
         pass
-
