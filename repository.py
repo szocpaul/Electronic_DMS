@@ -71,3 +71,18 @@ class DocumentManager(Repository):
                 return prefix + _file
             return None
         return [prefix + r for r in result]
+
+    def remove(self, uuid, documents, _file):
+        full = self.get_dir(uuid, documents) + _file
+        try:
+            os.remove(full)
+        except OSError:
+            return False
+        return True
+
+    def remove_dir(self, uuid, documents):
+        directory = self.get_dir(uuid, documents)
+        try:
+            shutil.rmtree(directory)
+        except OSError:
+            pass
