@@ -45,7 +45,6 @@ class DocumentManager(Repository):
     def load(self, uuid, documents, file_path):
         """Try to load an existing repository"""
         directory = self.get_dir(uuid, documents)
-        print(directory)
         if not os.path.exists(directory):
             os.makedirs(directory)
         shutil.copy2(file_path, directory)
