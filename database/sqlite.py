@@ -124,6 +124,13 @@ class EdmsSqlite(object):
         cursor.execute("DELETE FROM tag WHERE uuid = ?", sqlite_uuid)
         self.connect.commit()
 
+    def update_db(self):
+        self.ensure_not_empty()
+        cursor = self.connect.cursor()
+        cursor.execute("SELECT value FROM config WHERE key = 'version'")
+        result = cursor.fetchone()
+        self.update_from_version(int(result[0]))
+
     def update_from_version(self, old_version):
         cursor = self.connect.cursor()
         if old_version < 1:
