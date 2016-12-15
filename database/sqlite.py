@@ -19,9 +19,9 @@ class EdmsSqlite(database.EdmsDatabase):
         self.connect = sqlite3.connect(_file)
         self.update_db()
 
-    def save(self, _document):
+    def save(self, document):
         cursor = self.connect.cursor()
-        if _document.in_database:
+        if document.in_database:
             stmt = """UPDATE document SET
                 name=:name,
                 title=:title,
@@ -43,23 +43,23 @@ class EdmsSqlite(database.EdmsDatabase):
                 :state,
                 :is_public
             """
-        sqlite_uuid = sqlite3.Binary(_document.uuid.bytes)
+        sqlite_uuid = sqlite3.Binary(document.uuid.bytes)
         values = {
             "uuid": sqlite_uuid,
-            "title": _document.title,
-            "creation_date": _document.creation_date.isoformat(),
-            "document_date": _document.document_date.isoformat(),
-            "author": _document.author,
-            "description": _document.description,
-            "state": _document.state,
-            "is_public": _document.is_public
+            "title": document.title,
+            "creation_date": document.creation_date.isoformat(),
+            "document_date": document.document_date.isoformat(),
+            "author": document.author,
+            "description": document.description,
+            "state": document.state,
+            "is_public": document.is_public
         }
         cursor.execute(stmt, values)
 
         cursor.execute("DELETE FROM tag WHERE uuid=:uuid", {"uuid": sqlite_uuid})
 
         def tag_gen():
-            for t in _document.tags:
+            for t in document.tags:
                 yield (sqlite_uuid, t)
 
         cursor.executemany("INSERT INTO tag VALUES (:uuid, :tag)", tag_gen())
