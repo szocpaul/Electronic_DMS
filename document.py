@@ -14,6 +14,7 @@ class Document(object):
                  description="",
                  state="",
                  is_public=True,
+                 tags=set(),
                  in_database=False):
 
         """
@@ -51,6 +52,7 @@ class Document(object):
         self._description = description
         self._state = state
         self._is_public = is_public
+        self._tags = tags
         self._in_database = in_database
 
     @property
@@ -145,3 +147,17 @@ class Document(object):
     @in_database.setter
     def in_database(self, value):
         self._in_database = value
+
+    @property
+    def tags(self):
+        return self._tags
+
+    @tags.setter
+    def tags(self, value):
+        self._tags = value
+
+    def add_tag(self, tag):
+        self.tags.add(tag)
+
+    def remove_tag(self, tag):
+        self.tags.remove(tag)
