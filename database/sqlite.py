@@ -15,9 +15,9 @@ class EdmsSqlite(object):
 
         self.connect = sqlite3.connect(_file)
 
-    def save(self, document):
+    def save(self, _document):
         cursor = self.connect.cursor()
-        if document.in_database:
+        if _document.in_database:
             stmt = """UPDATE document SET
                 name=:name,
                 title=:title,
@@ -39,23 +39,23 @@ class EdmsSqlite(object):
                 :state,
                 :is_public
             """
-        sqlite_uuid = sqlite3.Binary(document.uuid.bytes)
+        sqlite_uuid = sqlite3.Binary(_document.uuid.bytes)
         values = {
             "uuid": sqlite_uuid,
-            "title": document.title,
-            "creation_date": document.creation_date.isoformat(),
-            "document_date": document.document_date.isoformat(),
-            "author": document.author,
-            "description": document.description,
-            "state": document.state,
-            "is_public": document.is_public
+            "title": _document.title,
+            "creation_date": _document.creation_date.isoformat(),
+            "document_date": _document.document_date.isoformat(),
+            "author": _document.author,
+            "description": _document.description,
+            "state": _document.state,
+            "is_public": _document.is_public
         }
         cursor.execute(stmt, values)
 
         cursor.execute("DELETE FROM tag WHERE uuid=:uuid", {"uuid": sqlite_uuid})
 
         def tag_gen():
-            for t in document.tags:
+            for t in _document.tags:
                 yield (sqlite_uuid, t)
 
         cursor.executemany("INSERT INTO tag VALUES (:uuid, :tag)", tag_gen())
@@ -88,3 +88,19 @@ class EdmsSqlite(object):
             tags=tags,
             in_database=True
         )
+
+    def search(self, tags, from_date, to_date):
+        cursor = self.connect.cursor()
+        stmt = """SELECT uuid FROM document WHERE document_date >= ?
+            AND document_date <= ?
+            AND uuid IN(
+            SELECT uuid FROM tag where tag in (""" + ",".join("?" * len(tags)) + """)
+            GROUP BY uuid
+            HAVING COUNT(tag) = ?)
+        """
+
+        values = [from_date.isoformat(), to_date.isoformat()]
+        if len(tags) > 0:
+            values = values + tags + [len(tags)]
+        cursor.execute(stmt, values)
+        return [self.load(raw_uuid=r[0]) for r in cursor.fetchall()]
