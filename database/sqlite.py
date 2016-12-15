@@ -51,6 +51,14 @@ class EdmsSqlite(object):
             "is_public": document.is_public
         }
         cursor.execute(stmt, values)
+
+        cursor.execute("DELETE FROM tag WHERE uuid=:uuid", {"uuid": sqlite_uuid})
+
+        def tag_gen():
+            for t in document.tags:
+                yield (sqlite_uuid, t)
+
+        cursor.executemany("INSERT INTO tag VALUES (:uuid, :tag)", tag_gen())
         self.connect.commit()
 
     def load(self, uuid=None, raw_uuid=None):
@@ -64,6 +72,10 @@ class EdmsSqlite(object):
         if result is None:
             return None
 
+        stmt = "SELECT tag FROM tag WHERE uuid=:uuid"
+        cursor.execute(stmt, {"uuid": sqlite_uuid})
+        tags = set([t[0] for t in cursor.fetchall()])
+
         return document.Document(
             uuid=uuid,
             title=result[0],
@@ -73,5 +85,6 @@ class EdmsSqlite(object):
             description=result[4],
             state=result[5],
             is_public=result[6],
+            tags=tags,
             in_database=True
         )
