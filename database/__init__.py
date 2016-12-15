@@ -37,7 +37,7 @@ class EdmsDatabase(object):
         pass
 
     @virtual
-    def remove(self):
+    def remove(self, doc):
         pass
 
 

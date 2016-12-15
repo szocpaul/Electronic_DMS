@@ -2,10 +2,13 @@ import sqlite3
 import document
 import uuid as uuid_lib
 import datetime
+import database
 
 
-class EdmsSqlite(object):
+class EdmsSqlite(database.EdmsDatabase):
     def __init__(self, configuration):
+        if "sqlite" not in configuration:
+            raise KeyError("database.sqlite not found in configuration")
         sqlite_config = configuration['sqlite']
 
         if "file" in sqlite_config:
