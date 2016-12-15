@@ -124,6 +124,44 @@ class EdmsSqlite(object):
         cursor.execute("DELETE FROM tag WHERE uuid = ?", sqlite_uuid)
         self.connect.commit()
 
+    def update_from_version(self, old_version):
+        cursor = self.connect.cursor()
+        if old_version < 1:
+            cursor.execute("""
+            CREATE TABLE document(
+                uuid BLOB PRIMARY KEY,
+                title TEXT,
+                creation_date INT,
+                document_date INT,
+                author TEXT,
+                description TEXT,
+                state TEXT,
+                is_public TEXT
+            """)
+            cursor.execute("CREATE TABLE tag(uuid BLOB, tag TEXT, PRIMARY KEY (uuid, tag))")
+        if old_version < 2:
+            cursor.executescript("""
+                BEGIN TRANSACTION;
+                ALTER TABLE document RENAME TO document_old;
+                CREATE TABLE document(uuid BLOB PRIMARY KEY, title TEXT, creation_date INT, document_date INT, author TEXT, description TEXT, state TEXT, is_public TEXT);
+                INSERT INTO document(uuid, title, creation_date, document_date, author, description, state, is_public) SELECT uuid, title, creation_date, document_date, author, description, state, is_public FROM document_old;
+                DROP TABLE document_old;
+                COMMIT;""")
+            self.connect.commit()
+
+            cursor2 = self.connect.cursor()
+            cursor.execute("SELECT uuid, creation_date, document_date FROM document")
+            while True:
+                result = cursor.fetchone()
+                if result is None:
+                    break
+                uuid_lob = result[0]
+                creation_date = datetime.date.fromtimestamp(int(result[1])).isoformat()
+                document_date = datetime.date.fromtimestamp(int(result[2])).isoformat()
+                cursor2.execute("UPDATE document SET creation_date = ?, document_date = ? WHERE uuid = ?", (creation_date, document_date, uuid_lob))
+        cursor.execute("UPDATE config SET value = '2' WHERE key = 'version'")
+        self.connect.commit()
+
     def ensure_not_empty(self):
         cursor = self.connect.cursor()
         try:
