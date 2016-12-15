@@ -124,15 +124,12 @@ class Document(object):
             raise ValueError('The "{}" is an invalid document state!'.format(value))
 
     @property
-    def doc_format(self):
-        return self._doc_format
-
-    @doc_format.setter
-    def doc_format(self, value):
-        self._doc_format = value
-
     def is_public(self):
         return self._is_public
+
+    @is_public.setter
+    def is_public(self, value):
+        self._is_public = value
 
     def make_public(self):
         self._is_public = True
