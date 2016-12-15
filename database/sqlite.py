@@ -14,6 +14,7 @@ class EdmsSqlite(object):
             _file = "edms_sqlite.db"
 
         self.connect = sqlite3.connect(_file)
+        self.update_db()
 
     def save(self, _document):
         cursor = self.connect.cursor()
