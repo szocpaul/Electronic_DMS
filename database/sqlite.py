@@ -123,3 +123,15 @@ class EdmsSqlite(object):
         cursor.execute("DELETE FROM document WHERE uuid = ?", sqlite_uuid)
         cursor.execute("DELETE FROM tag WHERE uuid = ?", sqlite_uuid)
         self.connect.commit()
+
+    def ensure_not_empty(self):
+        cursor = self.connect.cursor()
+        try:
+            stmt = "SELECT * FROM config"
+            cursor.execute(stmt)
+            # result = cursor.fetchone()
+        except sqlite3.OperationalError:
+            stmt = "CREATE TABLE config(key Text PRIMARY KEY, value TEXT)"
+            cursor.execute(stmt)
+            stmt2 = "INSERT INTO config VALUES ('version', '0')"
+            cursor.execute(stmt2)
