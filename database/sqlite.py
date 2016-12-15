@@ -1,6 +1,6 @@
 import sqlite3
 import document
-import uuid as uuidlib
+import uuid as uuid_lib
 import datetime
 
 
@@ -65,7 +65,7 @@ class EdmsSqlite(object):
         cursor = self.connect.cursor()
         stmt = "SELECT title, creation_date, document_date, author, description, state, is_public FROM document WHERE uuid = :uuid"
         if raw_uuid is not None:
-            uuid = uuidlib.UUID(bytes=raw_uuid)
+            uuid = uuid_lib.UUID(bytes=raw_uuid)
         sqlite_uuid = sqlite3.Binary(uuid.bytes)
         cursor.execute(stmt, {"uuid": sqlite_uuid})
         result = cursor.fetchone()
@@ -104,3 +104,22 @@ class EdmsSqlite(object):
             values = values + tags + [len(tags)]
         cursor.execute(stmt, values)
         return [self.load(raw_uuid=r[0]) for r in cursor.fetchall()]
+
+    def tag_count(self):
+        cursor = self.connect.cursor()
+        stmt = "SELECT tag, COUNT(uuid) FROM tag GROUP BY tag"
+        cursor.execute(stmt)
+        return [{'title': r[0], 'count': r[1]} for r in cursor.fetchall()]
+
+    def tag_less(self):
+        cursor = self.connect.cursor()
+        stmt = "SELECT uuid FROM document WHERE uuid NOT IN (SELECT uuid FROM tag)"
+        cursor.execute(stmt)
+        return [self.load(raw_uuid=r[0]) for r in cursor.fetchall()]
+
+    def remove(self, doc):
+        cursor = self.connect.cursor()
+        sqlite_uuid = sqlite3.Binary(doc.uuid.bytes)
+        cursor.execute("DELETE FROM document WHERE uuid = ?", sqlite_uuid)
+        cursor.execute("DELETE FROM tag WHERE uuid = ?", sqlite_uuid)
+        self.connect.commit()
