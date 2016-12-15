@@ -10,8 +10,10 @@ class Document(object):
                  title="",
                  creation_date=None,
                  document_date=None,
-                 authors=set(),
+                 author="",
                  description="",
+                 state="",
+                 is_public=True,
                  in_database=False):
 
         """
@@ -45,8 +47,10 @@ class Document(object):
         self._title = title
         self._creation_date = creation_date
         self._document_date = document_date
-        self._authors = authors
+        self._author = author
         self._description = description
+        self._state = state
+        self._is_public = is_public
         self._in_database = in_database
 
     @property
@@ -84,17 +88,11 @@ class Document(object):
 
     @property
     def authors(self):
-        return self._authors
+        return self._author
 
     @authors.setter
     def authors(self, value):
-        self._authors = value
-
-    def add_authors(self, author):
-        return self._authors.add(author)
-
-    def remove_author(self, author):
-        return self._authors.remove(author)
+        self._author = value
 
     @property
     def title(self):
@@ -111,6 +109,34 @@ class Document(object):
     @description.setter
     def description(self, value):
         self._description = value
+
+    @property
+    def state(self):
+        return self._state
+
+    @state.setter
+    def state(self, value):
+        if value in ['new', 'pending', 'accepted', 'rejected']:
+            self._state = value
+        else:
+            raise ValueError('The "{}" is an invalid document state!'.format(value))
+
+    @property
+    def doc_format(self):
+        return self._doc_format
+
+    @doc_format.setter
+    def doc_format(self, value):
+        self._doc_format = value
+
+    def is_public(self):
+        return self._is_public
+
+    def make_public(self):
+        self._is_public = True
+
+    def make_private(self):
+        self._is_public = False
 
     @property
     def in_database(self):
