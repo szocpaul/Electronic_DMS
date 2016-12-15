@@ -1,4 +1,4 @@
-import uuid as uuidlib
+import uuid as uuid_lib
 import datetime
 
 
@@ -20,7 +20,7 @@ class Document(object):
         """
         First version without property
         if uuid is None:
-            self.uuid = uuidlib.uuid4()
+            self.uuid = uuid_lib.uuid4()
         else:
             self.uuid = uuid
         self.title = title
@@ -84,7 +84,7 @@ class Document(object):
     @uuid.setter
     def uuid(self, value):
         if value is None:
-            self._uuid = uuidlib.uuid4()
+            self._uuid = uuid_lib.uuid4()
         else:
             self._uuid = value
 
