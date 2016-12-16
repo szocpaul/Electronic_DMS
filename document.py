@@ -17,33 +17,6 @@ class Document(object):
                  tags=set(),
                  in_database=False):
 
-        """
-        First version without property
-        if uuid is None:
-            self.uuid = uuid_lib.uuid4()
-        else:
-            self.uuid = uuid
-        self.title = title
-        if creation_date is None:
-            self.creation_date = datetime.date.today()
-        else:
-            self.document_date = creation_date
-        if document_date is None:
-            self.document_date = datetime.date.today()
-        else:
-            self.document_date = document_date
-        self.authors = authors
-        self.description = description
-        self.in_database = in_database
-
-    def add_authors(self, author):
-        return self.authors.add(author)
-
-    def remove_author(self, author):
-        return self.authors.remove(author)
-    """
-
-    # With properties
         self._uuid = uuid
         self._title = title
         self._creation_date = creation_date
