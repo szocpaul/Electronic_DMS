@@ -97,6 +97,8 @@ class EdmsSqlite(database.EdmsDatabase):
         cursor = self.connect.cursor()
         stmt = """SELECT uuid FROM document WHERE document_date >= ?
             AND document_date <= ?
+            """
+        stmt_tag = """
             AND uuid IN(
             SELECT uuid FROM tag where tag in (""" + ",".join("?" * len(tags)) + """)
             GROUP BY uuid
@@ -105,6 +107,7 @@ class EdmsSqlite(database.EdmsDatabase):
 
         values = [from_date.isoformat(), to_date.isoformat()]
         if len(tags) > 0:
+            stmt = stmt + stmt_tag
             values = values + tags + [len(tags)]
         cursor.execute(stmt, values)
         return [self.load(raw_uuid=r[0]) for r in cursor.fetchall()]
@@ -131,7 +134,7 @@ class EdmsSqlite(database.EdmsDatabase):
     def update_db(self):
         self.ensure_not_empty()
         cursor = self.connect.cursor()
-        cursor.execute("SELECT value FROM config WHERE key = 'version'")
+        cursor.execute("SELECT value FROM config WHERE key='version'")
         result = cursor.fetchone()
         self.update_from_version(int(result[0]))
 
@@ -147,17 +150,18 @@ class EdmsSqlite(database.EdmsDatabase):
                 author TEXT,
                 description TEXT,
                 state TEXT,
-                is_public TEXT
+                is_public TEXT)
             """)
             cursor.execute("CREATE TABLE tag(uuid BLOB, tag TEXT, PRIMARY KEY (uuid, tag))")
         if old_version < 2:
             cursor.executescript("""
                 BEGIN TRANSACTION;
                 ALTER TABLE document RENAME TO document_old;
-                CREATE TABLE document(uuid BLOB PRIMARY KEY, title TEXT, creation_date INT, document_date INT, author TEXT, description TEXT, state TEXT, is_public TEXT);
+                CREATE TABLE document(uuid BLOB PRIMARY KEY, title TEXT, creation_date TEXT, document_date TEXT, author TEXT, description TEXT, state TEXT, is_public TEXT);
                 INSERT INTO document(uuid, title, creation_date, document_date, author, description, state, is_public) SELECT uuid, title, creation_date, document_date, author, description, state, is_public FROM document_old;
                 DROP TABLE document_old;
-                COMMIT;""")
+                COMMIT;
+                """)
             self.connect.commit()
 
             cursor2 = self.connect.cursor()
@@ -182,5 +186,5 @@ class EdmsSqlite(database.EdmsDatabase):
         except sqlite3.OperationalError:
             stmt = "CREATE TABLE config(key Text PRIMARY KEY, value TEXT)"
             cursor.execute(stmt)
-            stmt2 = "INSERT INTO config VALUES ('version', '0')"
-            cursor.execute(stmt2)
+            stmt = "INSERT INTO config VALUES ('version', '0')"
+            cursor.execute(stmt)

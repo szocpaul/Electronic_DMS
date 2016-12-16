@@ -13,6 +13,13 @@ import config
 app = Flask(__name__)
 
 
+def get_db():
+    configuration = config.parse('config.toml')
+    db = database.get_instance(configuration)
+    repo = repository.get_instance(configuration)
+    return (db, repo)
+
+
 @app.route("/")
 def index():
     return flask.render_template("index.html")
@@ -24,7 +31,7 @@ def search():
         will parse the content of the query string. (the part in URL after the question mark)
         dateutil.parser.parse(to_raw).date():
         example: from (01-02-2013) to (2013, 1, 2)"""
-    db, _ = edms_import.get_db()
+    db, _ = get_db()
     tags = [tag for tag in flask.request.args.get('tags').split(' ') if tag != '']
     to_raw = flask.request.args.get('to', '')
     from_raw = flask.request.args.get('from', '')

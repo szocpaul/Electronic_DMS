@@ -2,7 +2,7 @@
 type = "sqlite"
 
 [database.sqlite]
-file = "dbedms.db
+file = "dbedms.db"
 
 [repository]
 location = "data"
