@@ -79,7 +79,7 @@ def document(uuid):
 
 
 @app.route("/upload/<uuid>", methods=['POST'])
-def upload(uuid, documents):
+def upload(uuid):
     _, repo = get_db()
     try:
         uuid = uuid_lib.UUID(uuid)
@@ -88,9 +88,9 @@ def upload(uuid, documents):
 
     if 'document' not in flask.request.files:
         return "no upload"  # TODO
-    _file = flask.request.files['document']
-    file_name = werkzeug.secure_filename(_file.file_name)
-    repo.save(uuid, documents, _file, file_name)
+    file = flask.request.files['document']
+    filename = werkzeug.secure_filename(file.filename)
+    repo.save(uuid, file, filename)
 
     return flask.redirect(flask.url_for('edit', uuid=str(uuid)), code=303)
 

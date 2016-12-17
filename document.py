@@ -24,7 +24,7 @@ class Document(object):
         if creation_date is None:
             self.creation_date = datetime.date.today()
         else:
-            self.document_date = creation_date
+            self.creation_date = creation_date
         if document_date is None:
             self.document_date = datetime.date.today()
         else:

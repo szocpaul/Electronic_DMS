@@ -4,7 +4,7 @@
     <tr><td>title:</td><td>{{ doc.title }}</td></tr>
     <tr><td>date:</td><td>{{ doc.document_date }}</td></tr>
     <tr><td>author:</td><td>{{ doc.author}}</td></tr>
-    <tr><td>description:</td><td>{{ doc.description if doc.description != None }}</td></tr>
+    <tr><td>description:</td><td><p style="white-space:pre-wrap">{{ doc.description if doc.description != None }}</p></td></tr>
     <tr><td>state:</td><td>{{ for state in doc.state }}</td></tr>
     <tr><td>is_public:</td><td>{{ doc.is_public }}</td></tr>
     <tr><td>tags:</td><td>
@@ -27,8 +27,5 @@
     </td>
     </tr>
 </table>
-<form method="post" action="{{ url_for('upload', uuid=doc.uuid) }}" enctype="multipart/form-data">
-    <input type="file" name="document">
-    <input type="submit">
-</form>
+<a href="{{ url_for('edit', uuid=doc.uuid) }}">Edit document</a>
 {% endblock %}

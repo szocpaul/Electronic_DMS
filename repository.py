@@ -40,15 +40,15 @@ class Repository(object):
     def get_dir(self, uuid, documents="documents"):
         return self.base + "/" + str(uuid) + "/" + documents + "/"
 
-    def load(self, uuid, documents, file_path):
+    def load(self, uuid, file_path):
         """Try to load an existing repository"""
-        directory = self.get_dir(uuid, documents)
+        directory = self.get_dir(uuid, documents="documents")
         if not os.path.exists(directory):
             os.makedirs(directory)
         shutil.copy2(file_path, directory)
 
-    def save(self, uuid, documents, _file, file_name):
-        directory = self.get_dir(uuid, documents)
+    def save(self, uuid, _file, file_name):
+        directory = self.get_dir(uuid, documents="documents")
         if not os.path.exists(directory):
             os.makedirs(directory)
         target = os.path.join(directory, file_name)
@@ -70,16 +70,16 @@ class Repository(object):
             return None
         return [prefix + r for r in result]
 
-    def remove(self, uuid, documents, _file):
-        full = self.get_dir(uuid, documents) + _file
+    def remove(self, uuid, _file):
+        full = self.get_dir(uuid, documents="documents") + _file
         try:
             os.remove(full)
         except OSError:
             return False
         return True
 
-    def remove_dir(self, uuid, documents):
-        directory = self.get_dir(uuid, documents)
+    def remove_dir(self, uuid):
+        directory = self.get_dir(uuid, documents="documents")
         try:
             shutil.rmtree(directory)
         except OSError:

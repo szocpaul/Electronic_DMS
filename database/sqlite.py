@@ -23,7 +23,6 @@ class EdmsSqlite(database.EdmsDatabase):
         cursor = self.connect.cursor()
         if document.in_database:
             stmt = """UPDATE document SET
-                name=:name,
                 title=:title,
                 creation_date=:creation_date,
                 document_date=:document_date,
@@ -31,6 +30,7 @@ class EdmsSqlite(database.EdmsDatabase):
                 description=:description,
                 state=:state
                 is_public=:is_public
+                WHERE uuid=:uuid
             """
         else:
             stmt = "INSERT INTO document VALUES (:uuid, :title, :creation_date, :document_date, :author, :description, :state, :is_public)"
@@ -45,7 +45,11 @@ class EdmsSqlite(database.EdmsDatabase):
             "state": document.state,
             "is_public": document.is_public
         }
-        cursor.execute(stmt, values)
+
+        try:
+            cursor.execute(stmt, values)
+        except sqlite3.IntegrityError:
+            raise database.ExistError()
 
         cursor.execute("DELETE FROM tag WHERE uuid=:uuid", {"uuid": sqlite_uuid})
 
@@ -98,7 +102,7 @@ class EdmsSqlite(database.EdmsDatabase):
 
         values = [from_date.isoformat(), to_date.isoformat()]
         if len(tags) > 0:
-            stmt = stmt + stmt_tag
+            stmt += stmt_tag
             values = values + tags + [len(tags)]
         cursor.execute(stmt, values)
         return [self.load(raw_uuid=r[0]) for r in cursor.fetchall()]
