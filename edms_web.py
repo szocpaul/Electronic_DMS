@@ -128,7 +128,7 @@ def save(uuid):
         try:
             date = dateutil.parser.parse(form['date']).date()
         except ValueError:
-            return "Invalid date"   # TODO
+            return "Invalid date"  # TODO
         doc.title = form['title']
         doc.document_date = date
         doc.author = form['author']
@@ -149,6 +149,26 @@ def save(uuid):
         repo.remove(uuid, file)
 
     return flask.redirect(flask.url_for('edit', uuid=doc.uuid), code=303)
+
+
+@app.route("/delete/<uuid>", methods=['GET', 'POST'])
+def delete(uuid):
+    db, repo = get_db()
+    try:
+        uuid = uuid_lib.UUID(uuid)
+    except ValueError:
+        return "not found"  # TODO
+    doc = db.load(uuid)
+    if doc is None:
+        return "not found"  # TODO
+
+    if flask.request.method == 'POST' and 'yes' in flask.request.form:
+        db.remove(doc)
+        repo.remove_dir(doc.uuid)
+        return flask.redirect(flask.url_for('index'), code=303)
+
+    return flask.render_template("delete.html", doc=doc)
+
 
 if __name__ == "__main__":
     app.run(debug=True)
