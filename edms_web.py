@@ -17,7 +17,7 @@ def get_db():
     configuration = config.parse('config.toml')
     db = database.get_instance(configuration)
     repo = repository.get_instance(configuration)
-    return (db, repo)
+    return db, repo
 
 
 @app.route("/")
@@ -67,7 +67,7 @@ def search():
 
 @app.route("/document/<uuid>")
 def document(uuid):
-    db, repo = edms_import.get_db()
+    db, repo = get_db()
     try:
         uuid = uuid_lib.UUID(uuid)
     except ValueError:
@@ -78,6 +78,18 @@ def document(uuid):
     files = repo.get(uuid, basename_only=True)
     return flask.render_template("document.html", doc=doc, files=files)
 
+
+@app.route("/download/<uuid>/<file>")
+def download(uuid, documents, file):
+    _, repo = get_db()
+    try:
+        uuid = uuid_lib.UUID(uuid)
+    except ValueError:
+        return "not found"  # TODO
+    path = repo.get(uuid, file=file)
+    if path is None:
+        return "not found"  # TODO
+    return flask.send_from_directory("data/" + str(uuid) + "/" + documents + "/", file)
 
 if __name__ == "__main__":
     app.run(debug=True)
