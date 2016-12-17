@@ -170,5 +170,10 @@ def delete(uuid):
     return flask.render_template("delete.html", doc=doc)
 
 
+@app.route("/create")
+def create():
+    return flask.render_template("create.html")
+
+
 if __name__ == "__main__":
     app.run(debug=True)
