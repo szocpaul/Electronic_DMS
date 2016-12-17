@@ -108,5 +108,47 @@ def download(uuid, file):
     return flask.send_from_directory(repo.get_dir(uuid), file, as_attachment=True)
 
 
+@app.route("/save/<uuid>", methods=['POST'])
+def save(uuid):
+    db, repo = get_db()
+
+    if uuid == 'new':
+        doc = document.Document()
+    else:
+        try:
+            uuid = uuid_lib.UUID(uuid)
+        except ValueError:
+            return "not found"  # TODO
+        doc = db.load(uuid)
+        if doc is None:
+            return "not found"
+
+    form = flask.request.form
+    if 'title' in form and 'description' in form and 'date' in form:
+        try:
+            date = dateutil.parser.parse(form['date']).date()
+        except ValueError:
+            return "Invalid date"   # TODO
+        doc.title = form['title']
+        doc.document_date = date
+        doc.author = form['author']
+        doc.description = form['description']
+        doc.state = form['state']
+        doc.is_public = form['is_public']
+        db.save(doc)
+    if 'deltag' in form and 'tag' in form:
+        tag = form['tag']
+        doc.remove_tag(tag)
+        db.save(doc)
+    if 'addtag' in form and 'tag' in form:
+        for tag in form['tag'].split():
+            doc.add_tag(tag)
+        db.save(doc)
+    if 'delfile' in form and 'file' in form:
+        file = form['file']
+        repo.remove(uuid, file)
+
+    return flask.redirect(flask.url_for('edit', uuid=doc.uuid), code=303)
+
 if __name__ == "__main__":
     app.run(debug=True)

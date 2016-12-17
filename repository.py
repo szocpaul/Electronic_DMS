@@ -39,7 +39,7 @@ class Repository(object):
 
 
 class DocumentManager(Repository):
-    def get_dir(self, uuid, documents="Documents"):
+    def get_dir(self, uuid, documents="documents"):
         return self.base + "/" + str(uuid) + "/" + documents + "/"
 
     def load(self, uuid, documents, file_path):

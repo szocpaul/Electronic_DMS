@@ -2,7 +2,7 @@
 {% block content %}
 <table>
     <tr><td>title:</td><td>{{ doc.title }}</td></tr>
-    <tr><td>Date:</td><td>{{ doc.document_date }}</td></tr>
+    <tr><td>date:</td><td>{{ doc.document_date }}</td></tr>
     <tr><td>author:</td><td>{{ doc.author}}</td></tr>
     <tr><td>description:</td><td>{{ doc.description if doc.description != None }}</td></tr>
     <tr><td>state:</td><td>{{ for state in doc.state }}</td></tr>
