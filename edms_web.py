@@ -1,6 +1,6 @@
 import flask
 from flask import Flask
-import document
+import document as doclib
 import uuid as uuid_lib
 import datetime
 import dateutil.parser
@@ -108,12 +108,27 @@ def download(uuid, file):
     return flask.send_from_directory(repo.get_dir(uuid), file, as_attachment=True)
 
 
+@app.route("/edit/<uuid>")
+def edit(uuid):
+    db, repo = get_db()
+    try:
+        uuid = uuid_lib.UUID(uuid)
+    except ValueError:
+        return "not found"  # TODO
+    doc = db.load(uuid)
+    if doc is None:
+        return "not found"  # TODO
+    files = repo.get(uuid, documents="documents", basename_only=True)
+
+    return flask.render_template("edit.html", doc=doc, files=files)
+
+
 @app.route("/save/<uuid>", methods=['POST'])
 def save(uuid):
     db, repo = get_db()
 
     if uuid == 'new':
-        doc = document.Document()
+        doc = doclib.Document()
     else:
         try:
             uuid = uuid_lib.UUID(uuid)

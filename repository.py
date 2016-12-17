@@ -37,8 +37,6 @@ class Repository(object):
             raise KeyError("repository.location is not configured")
         self.base = configuration['repository']['location']
 
-
-class DocumentManager(Repository):
     def get_dir(self, uuid, documents="documents"):
         return self.base + "/" + str(uuid) + "/" + documents + "/"
 
@@ -56,9 +54,9 @@ class DocumentManager(Repository):
         target = os.path.join(directory, file_name)
         _file.save(target)
 
-    def get(self, uuid, documents, _file=None, basename_only=False):
+    def get(self, uuid, documents="documents", _file=None, basename_only=False):
         result = []
-        directory = self.get_dir(documents, uuid)
+        directory = self.get_dir(uuid, documents)
         for (dir_path, dir_names, file_names) in os.walk(directory):
             result = file_names
             break

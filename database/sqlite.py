@@ -33,16 +33,7 @@ class EdmsSqlite(database.EdmsDatabase):
                 is_public=:is_public
             """
         else:
-            stmt = """INSERT INTO document VALUES
-                (:uuid,
-                :title,
-                :creation_date,
-                :document_date,
-                :author,
-                :description,
-                :state,
-                :is_public
-            """
+            stmt = "INSERT INTO document VALUES (:uuid, :title, :creation_date, :document_date, :author, :description, :state, :is_public)"
         sqlite_uuid = sqlite3.Binary(document.uuid.bytes)
         values = {
             "uuid": sqlite_uuid,

@@ -12,11 +12,36 @@ class Document(object):
                  document_date=None,
                  author="",
                  description="",
-                 state="",
+                 state="new",
                  is_public=True,
                  tags=set(),
                  in_database=False):
+        if uuid is None:
+            self.uuid = uuid_lib.uuid4()
+        else:
+            self.uuid = uuid
+        self.title = title
+        if creation_date is None:
+            self.creation_date = datetime.date.today()
+        else:
+            self.document_date = creation_date
+        if document_date is None:
+            self.document_date = datetime.date.today()
+        else:
+            self.document_date = document_date
+        self.author = author
+        self.description = description
+        self.state = state
+        self.is_public = is_public
+        self.tags = tags
+        self.in_database = in_database
 
+    def add_tag(self, tag):
+        self.tags.add(tag)
+
+    def remove_tag(self, tag):
+        self.tags.remove(tag)
+"""
         self._uuid = uuid
         self._title = title
         self._creation_date = creation_date
@@ -37,7 +62,7 @@ class Document(object):
         if value is None:
             self._document_date = datetime.date.today()
         else:
-            self._document_date = self._document_date
+            self._document_date = value
 
     @property
     def creation_date(self):
@@ -48,7 +73,7 @@ class Document(object):
         if value is None:
             self._creation_date = datetime.date.today()
         else:
-            self._document_date = self._creation_date
+            self._creation_date = value
 
     @property
     def uuid(self):
@@ -131,3 +156,4 @@ class Document(object):
 
     def remove_tag(self, tag):
         self.tags.remove(tag)
+"""
