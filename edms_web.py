@@ -1,14 +1,13 @@
 import flask
 from flask import Flask
 import document
-import edms_import
 import uuid as uuid_lib
-import repository
 import datetime
 import dateutil.parser
 import database
 import repository
 import config
+import werkzeug
 
 app = Flask(__name__)
 
@@ -79,8 +78,25 @@ def document(uuid):
     return flask.render_template("document.html", doc=doc, files=files)
 
 
+@app.route("/upload/<uuid>", methods=['POST'])
+def upload(uuid, documents):
+    _, repo = get_db()
+    try:
+        uuid = uuid_lib.UUID(uuid)
+    except ValueError:
+        return "not found upload uuid"  # TODO
+
+    if 'document' not in flask.request.files:
+        return "no upload"  # TODO
+    _file = flask.request.files['document']
+    file_name = werkzeug.secure_filename(_file.file_name)
+    repo.save(uuid, documents, _file, file_name)
+
+    return flask.redirect(flask.url_for('edit', uuid=str(uuid)), code=303)
+
+
 @app.route("/download/<uuid>/<file>")
-def download(uuid, documents, file):
+def download(uuid, file):
     _, repo = get_db()
     try:
         uuid = uuid_lib.UUID(uuid)
@@ -89,7 +105,8 @@ def download(uuid, documents, file):
     path = repo.get(uuid, file=file)
     if path is None:
         return "not found"  # TODO
-    return flask.send_from_directory("data/" + str(uuid) + "/" + documents + "/", file)
+    return flask.send_from_directory(repo.get_dir(uuid), file, as_attachment=True)
+
 
 if __name__ == "__main__":
     app.run(debug=True)
