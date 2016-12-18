@@ -1,31 +1,66 @@
 {% extends "base.html" %}
 {% block content %}
-<table>
-    <tr><td>title:</td><td>{{ doc.title }}</td></tr>
-    <tr><td>date:</td><td>{{ doc.document_date }}</td></tr>
-    <tr><td>author:</td><td>{{ doc.author}}</td></tr>
-    <tr><td>description:</td><td><p style="white-space:pre-wrap">{{ doc.description if doc.description != None }}</p></td></tr>
-    <tr><td>state:</td><td>{{ for state in doc.state }}</td></tr>
-    <tr><td>is_public:</td><td>{{ doc.is_public }}</td></tr>
-    <tr><td>tags:</td><td>
-        <ul>
-            {% for for tag in doc.tags %}
-            <li>{{ tag }}</li>
-            {% endfor %}
-        </ul>
-    </td>
-    </tr>
-    <tr><td>Files</td>
-    <td>
-        <ul>
-            {% for file in files %}
-            <li>
-                <a href="{{ url_for('download', uuid=doc.uuid, file=file) }}">{{ file }}</a>
-            </li>
-            {% endfor %}
-        </ul>
-    </td>
-    </tr>
-</table>
-<a href="{{ url_for('edit', uuid=doc.uuid) }}">Edit document</a>
+<h2>{{ doc.title }}</h2>
+
+<div class="row">
+    <div class="col-md-1">
+        <strong>Date</strong>
+    </div>
+    <div class="col-md-3">
+        {{ doc.document_date }}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-1">
+        <strong>author</strong>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-1">
+        <strong>description</strong>
+    </div>
+    <div class="col-md-3">
+        <div class="'prewrap">{{ doc.description if doc.description != None }}</div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-1">
+        <strong>state</strong>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-1">
+        <strong>is_public</strong>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-1">
+        <strong>Tags</strong>
+    </div>
+</div>
+
+<div>
+    {% for tag in doc.tags|sort %}
+    <a href="{{ url_for('search') }}?tags={{ tag }}" class="btn btn-default btn-inlineblock">{{ tag }}</a>
+    {% endfor %}
+</div>
+
+<div class="row">
+    <div class="col-md-1">
+        <strong>Files</strong>
+    </div>
+</div>
+{% for file in files|sort %}
+<div class="row">
+    <div class="col-md-8">
+        <a class="btn btn-link truncate" href="{{ url_for('download', uuid=doc.uuid, file=file) }}">{{file }}</a>
+    </div>
+</div>
+{% endfor %}
+<a class="btn btn-warning" href="{{ url_for('edit', uuid=doc.uuid) }}">Edit document</a>
 {% endblock %}

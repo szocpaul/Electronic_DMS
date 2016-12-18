@@ -7,51 +7,112 @@
 {% block content %}
 <h2>General</h2>
 <form method="post" action="{{ url_for('save', uuid=doc.uuid) }}">
-    <table>
-        <tr><td>title:</td><td><input type="text" name="title" value="{{ doc.title }}"></td></tr>
-        <tr><td>date:</td><td><input type="text" name="date" value="{{ doc.document_date }}"></td></tr>
-        <tr><td>author:</td><td><input type="text" name="author" value="{{ doc.author }}"></td></tr>
-        <tr><td>description:</td><td><textarea name="description" cols=70 rows=10>{{ doc.description if doc.description != None }}</textarea></td></tr>
-        <tr><td>state:</td><td><input type="text" name="state" value="{{ doc.state }}"></td></tr>
-        <tr><td>is_public:</td><td><input type="text" name="is_public" value="{{ doc.is_public }}"></td></tr>
-    </table>
-    <input type="submit" value="Save">
+    <div class="form-group row">
+        <div class="col-md-4">
+            <label for="title">title</label>
+            <input type="text" id="title" name="title" value="{{ doc.title }}" class="form-control">
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-4">
+            <label for="date">date</label>
+            <input type="date" id="date" name="date" value="{{ doc.document_date }}" class="form-control">
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-4">
+            <label for="author">author</label>
+            <input type="text" id="author" name="author" value="{{ doc.author }}" class="form-control">
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-8">
+            <label for="description">description</label>
+            <textarea id="description" name="description" rows=10 class="form-control">{{ doc.description }}</textarea>
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-4">
+            <label for="state">state</label>
+            <input type="text" id="state" name="state" value="{{ doc.state }}" class="form-control">
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-4">
+            <label for="is_public">is_public</label>
+            <input type="text" id="is_public" name="is_public" value="{{ doc.is_public }}" class="form-control">
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-1">
+            <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+    </div>
 </form>
 
 <h2>Tags</h2>
-<ul>
+<p>Click a tag to <strong>delete</strong> it</p>
+<div>
     {% for tag in doc.tags|sort %}
-    <li>
-        {{ tag }}
+    <div class="btn-inlineblock">
         <form method="post" action="{{ url_for('save', uuid=doc.uuid) }}">
-            <input type="hidden" name="tag" value="{{ tag }}">
-            <input type="submit" name="deltag" value="Delete">
+            <input type="hidden" name="tag" value="{{ tag }}" class="form-control">
+            <button type="submit" name="deltag" class="btn btn-danger">{{ tag }}</button>
         </form>
-    </li>
+    </div>
     {% endfor %}
-</ul>
+</div>
+
+
+<div class="row"><div class="col-md-4">Add a tag</div></div>
 <form method="post" action="{{ url_for('save', uuid=doc.uuid) }}">
-    <input type="text" name="tag">
-    <input type="submit" name="addtag" value="Add tag">
+    <div class="row">
+        <div class="col-md-4">
+            <input type="text" name="tag" class="form-control">
+        </div>
+        <div class="col-md-1">
+            <button type="submit" name="addtag" class="btn btn-success">Add tag</button>
+        </div>
+    </div>
 </form>
 
 <h2>Files</h2>
-<ul>
-    {% for file in files %}
-    <li>
-        <a href="{{ url_for('download', uuid=doc.uuid, file=file) }}">{{ file }}</a>
+{% for file in files|sort %}
+<div class="row">
+    <div class="col-md-1">
         <form method="post" action="{{ url_for('save', uuid=doc.uuid) }}">
             <input type="hidden" name="file" value="{{ file }}">
-            <input type="submit" name="delfile" value="Delete">
+            <button type="submit" name="delfile" class="btn btn-danger">Delete</button>
         </form>
-    </li>
-    {% endfor %}
-</ul>
+    </div>
+    <div class="col-md-8">
+        <a class="btn btn-link truncate" href="{{ url_for('download', uuid=doc.uuid, file=file) }}">{{ file }}</a>
+    </div>
+</div>
+{% endfor %}
 
-<form method="post" action="{{ url_for('upload', uuid=doc.uuid) }}" enctype="multipart/form-data">
-    <input type="file" name="document">
-    <input type="submit">
-</form>
+<h3>Upload new</h3>
+<div class="row">
+    <form method="post" action="{{ url_for('upload', uuid=doc.uuid) }}" enctype="multipart/form-data">
+        <div class="form-group">
+            <div class="col-md-4">
+                <input type="file" name="document">
+            </div>
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-success">Upload</button>
+            </div>
+        </div>
+    </form>
+</div>
 
-<a href="{{ url_for('delete', uuid=doc.uuid) }}">Delete</a>
+<div class="row">
+    <div class="col-md-1">
+        <a href="{{ url_for('delete', uuid=doc.uuid) }}" class="btn btn-danger">Delete entire document</a>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-1">
+       <a class="btn btn-info" href="{{ url_for('document', uuid=doc.uuid) }}">View document</a>
+    </div>
+</div>
 {% endblock %}

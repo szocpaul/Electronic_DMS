@@ -1,8 +1,12 @@
-{% extends "base.html" %}
-{% block content %}
-<ul>
-    {% for doc in result %}
-    <li><a href="{{ url_for('document', uuid=doc.uuid) }}">{{ doc.title }} - {{ doc.document_date }}</a></li>
-    {% endfor %}
-</ul>
+{% extends "index.html" %}
+
+{% block result %}
+<h2>Results</h2>
+{% for doc in result %}
+<div class="row">
+    <div class="col-md-8">
+        <a class="btn btn-default" href="{{ url_for('document', uuid=doc.uuid) }}">{{ doc.title }} - {{ doc.document_date }}</a>
+    </div>
+</div>
+{% endfor %}
 {% endblock %}
