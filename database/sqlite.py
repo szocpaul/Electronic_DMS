@@ -94,15 +94,15 @@ class EdmsSqlite(database.EdmsDatabase):
             AND document_date <= ?
             """
         stmt_tag = """
-            AND uuid IN(
-            SELECT uuid FROM tag where tag in (""" + ",".join("?" * len(tags)) + """)
+            AND uuid IN (
+            SELECT uuid FROM tag where tag IN (""" + ",".join("?" * len(tags)) + """)
             GROUP BY uuid
             HAVING COUNT(tag) = ?)
         """
 
         values = [from_date.isoformat(), to_date.isoformat()]
         if len(tags) > 0:
-            stmt += stmt_tag
+            stmt = stmt + stmt_tag
             values = values + tags + [len(tags)]
         cursor.execute(stmt, values)
         return [self.load(raw_uuid=r[0]) for r in cursor.fetchall()]
@@ -122,8 +122,8 @@ class EdmsSqlite(database.EdmsDatabase):
     def remove(self, doc):
         cursor = self.connect.cursor()
         sqlite_uuid = sqlite3.Binary(doc.uuid.bytes)
-        cursor.execute("DELETE FROM document WHERE uuid = ?", sqlite_uuid)
-        cursor.execute("DELETE FROM tag WHERE uuid = ?", sqlite_uuid)
+        cursor.execute("DELETE FROM document WHERE uuid = ?", (sqlite_uuid,))
+        cursor.execute("DELETE FROM tag WHERE uuid = ?", (sqlite_uuid,))
         self.connect.commit()
 
     def update_db(self):
