@@ -70,8 +70,8 @@ class Repository(object):
             return None
         return [prefix + r for r in result]
 
-    def remove(self, uuid, _file):
-        full = self.get_dir(uuid, documents="documents") + _file
+    def remove(self, uuid):
+        full = self.get_dir(uuid)
         try:
             os.remove(full)
         except OSError:
@@ -79,7 +79,7 @@ class Repository(object):
         return True
 
     def remove_dir(self, uuid):
-        directory = self.get_dir(uuid, documents="documents")
+        directory = self.get_dir(uuid)
         try:
             shutil.rmtree(directory)
         except OSError:

@@ -113,9 +113,9 @@ class EdmsSqlite(database.EdmsDatabase):
         cursor.execute(stmt)
         return [{'title': r[0], 'count': r[1]} for r in cursor.fetchall()]
 
-    def tagless(self):
+    def repo_count(self):
         cursor = self.connect.cursor()
-        stmt = "SELECT uuid FROM document WHERE uuid NOT IN (SELECT uuid FROM tag)"
+        stmt = "SELECT uuid FROM document"
         cursor.execute(stmt)
         return [self.load(raw_uuid=r[0]) for r in cursor.fetchall()]
 

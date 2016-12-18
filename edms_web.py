@@ -191,10 +191,10 @@ def create():
     return flask.render_template("create.html")
 
 
-@app.route("/tagless")
-def tagless():
+@app.route("/repo_count")
+def repo_count():
     db, _ = get_db()
-    results = db.tagless()
+    results = db.repo_count()
     return flask.render_template("search.html", results=results)
 
 
