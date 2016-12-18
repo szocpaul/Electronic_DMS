@@ -13,7 +13,7 @@ class Document(object):
                  author="",
                  description="",
                  state="new",
-                 is_public=True,
+                 is_public="",
                  tags=set(),
                  in_database=False):
         if uuid is None:

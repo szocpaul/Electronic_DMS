@@ -28,7 +28,7 @@ class EdmsSqlite(database.EdmsDatabase):
                 document_date=:document_date,
                 author=:author,
                 description=:description,
-                state=:state
+                state=:state,
                 is_public=:is_public
                 WHERE uuid=:uuid
             """
@@ -85,7 +85,7 @@ class EdmsSqlite(database.EdmsDatabase):
             state=result[5],
             is_public=result[6],
             tags=tags,
-            in_database=True
+            in_database=True,
         )
 
     def search(self, tags, from_date, to_date):
