@@ -31,6 +31,7 @@ def search():
         dateutil.parser.parse(to_raw).date():
         example: from (01-02-2013) to (2013, 1, 2)"""
     db, _ = get_db()
+
     tags = [tag for tag in flask.request.args.get('tags').split(' ') if tag != '']
     to_raw = flask.request.args.get('to', '')
     from_raw = flask.request.args.get('from', '')
@@ -48,7 +49,7 @@ def search():
         except ValueError:
             pass
 
-    result = db.search(tags, from_date, to_date)
+    results = db.search(tags, from_date, to_date)
     search_tags = ' '.join(tags)
 
     if from_date == datetime.date.min:
@@ -60,7 +61,7 @@ def search():
     else:
         search_to = str(to_date)
 
-    return flask.render_template("search.html", results=result, search_tags=search_tags, search_from=search_from,
+    return flask.render_template("search.html", results=results, search_tags=search_tags, search_from=search_from,
                                  search_to=search_to)
 
 
@@ -193,8 +194,8 @@ def create():
 @app.route("/tagless")
 def tagless():
     db, _ = get_db()
-    result = db.tagless()
-    return flask.render_template("search.html", result=result)
+    results = db.tagless()
+    return flask.render_template("search.html", results=results)
 
 
 @app.route("/tagoverview")
