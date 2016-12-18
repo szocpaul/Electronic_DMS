@@ -25,9 +25,11 @@
 </form>
 
 {% block result %}
-<h2>Other option</h2>
+<h2>Repository Manager</h2>
 <ul>
-    <li><a href="{{ url_for('create') }}">Create new item</a></li>
+    <li><a href="{{ url_for('create') }}">Create new repository</a></li>
+    <li><a href="{{ url_for('tagless') }}">Get repository overview</a></li>
+    <li><a href="{{ url_for('tagoverview') }}">View All tags</a></li>
 </ul>
 {% endblock %}
 {% endblock %}

@@ -113,7 +113,7 @@ class EdmsSqlite(database.EdmsDatabase):
         cursor.execute(stmt)
         return [{'title': r[0], 'count': r[1]} for r in cursor.fetchall()]
 
-    def tag_less(self):
+    def tagless(self):
         cursor = self.connect.cursor()
         stmt = "SELECT uuid FROM document WHERE uuid NOT IN (SELECT uuid FROM tag)"
         cursor.execute(stmt)

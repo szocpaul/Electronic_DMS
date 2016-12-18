@@ -190,5 +190,19 @@ def create():
     return flask.render_template("create.html")
 
 
+@app.route("/tagless")
+def tagless():
+    db, _ = get_db()
+    result = db.tagless()
+    return flask.render_template("search.html", result=result)
+
+
+@app.route("/tagoverview")
+def tagoverview():
+    db, _ = get_db()
+    tags = db.tag_count()
+    return flask.render_template("tagoverview.html", tags=tags)
+
+
 if __name__ == "__main__":
     app.run(debug=True)

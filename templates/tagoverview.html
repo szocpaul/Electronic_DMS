@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+<div>
+    {% for tag in tags|sort(attribute='count', reverse=True) %}
+    <a href="{{ url_for('search') }}?tags={{ tag.title }}" class="btn btn-default btn-inlineblock">{{ tag.title }} ({{ tag.count }})</a>
+    {% endfor %}
+</div>
+{% endblock %}
