@@ -54,9 +54,9 @@ class Repository(object):
         target = os.path.join(directory, file_name)
         _file.save(target)
 
-    def get(self, uuid, documents="documents", _file=None, basename_only=False):
+    def get(self, uuid, _file=None, basename_only=False):
         result = []
-        directory = self.get_dir(uuid, documents)
+        directory = self.get_dir(uuid, documents="documents")
         for (dir_path, dir_names, file_names) in os.walk(directory):
             result = file_names
             break

@@ -118,7 +118,7 @@ def edit(uuid):
     doc = db.load(uuid)
     if doc is None:
         return "not found"  # TODO
-    files = repo.get(uuid, documents="documents", basename_only=True)
+    files = repo.get(uuid, basename_only=True)
 
     return flask.render_template("edit.html", doc=doc, files=files)
 
