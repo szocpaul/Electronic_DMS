@@ -54,7 +54,7 @@ class Repository(object):
         target = os.path.join(directory, file_name)
         _file.save(target)
 
-    def get(self, uuid, _file=None, basename_only=False):
+    def get(self, uuid, file=None, basename_only=False):
         result = []
         directory = self.get_dir(uuid, documents="documents")
         for (dir_path, dir_names, file_names) in os.walk(directory):
@@ -64,9 +64,9 @@ class Repository(object):
             prefix = ""
         else:
             prefix = directory
-        if _file is not None:
-            if _file in result:
-                return prefix + _file
+        if file is not None:
+            if file in result:
+                return prefix + file
             return None
         return [prefix + r for r in result]
 
