@@ -1,4 +1,5 @@
 import sqlite3
+import user
 import document
 import uuid as uuid_lib
 import datetime
@@ -51,13 +52,13 @@ class EdmsSqlite(database.EdmsDatabase):
         except sqlite3.IntegrityError:
             raise database.ExistError()
 
-        cursor.execute("DELETE FROM tag WHERE uuid=:uuid", {"uuid": sqlite_uuid})
+        cursor.execute("DELETE FROM user WHERE uuid=:uuid", {"uuid": sqlite_uuid})
 
-        def tag_gen():
-            for t in document.tags:
+        def user_gen():
+            for t in document.users:
                 yield (sqlite_uuid, t)
 
-        cursor.executemany("INSERT INTO tag VALUES (:uuid, :tag)", tag_gen())
+        cursor.executemany("INSERT INTO user VALUES (:uuid, :user)", user_gen())
         self.connect.commit()
 
     def load(self, uuid=None, raw_uuid=None):
@@ -71,9 +72,9 @@ class EdmsSqlite(database.EdmsDatabase):
         if result is None:
             return None
 
-        stmt = "SELECT tag FROM tag WHERE uuid=:uuid"
+        stmt = "SELECT user FROM user WHERE uuid=:uuid"
         cursor.execute(stmt, {"uuid": sqlite_uuid})
-        tags = set([t[0] for t in cursor.fetchall()])
+        users = set([t[0] for t in cursor.fetchall()])
 
         return document.Document(
             uuid=uuid,
@@ -84,32 +85,32 @@ class EdmsSqlite(database.EdmsDatabase):
             description=result[4],
             state=result[5],
             is_public=result[6],
-            tags=tags,
+            users=users,
             in_database=True,
         )
 
-    def search(self, tags, from_date, to_date):
+    def search(self, users, from_date, to_date):
         cursor = self.connect.cursor()
         stmt = """SELECT uuid FROM document WHERE document_date >= ?
             AND document_date <= ?
             """
-        stmt_tag = """
+        stmt_user = """
             AND uuid IN (
-            SELECT uuid FROM tag where tag IN (""" + ",".join("?" * len(tags)) + """)
+            SELECT uuid FROM user where user IN (""" + ",".join("?" * len(users)) + """)
             GROUP BY uuid
-            HAVING COUNT(tag) = ?)
+            HAVING COUNT(user) = ?)
         """
 
         values = [from_date.isoformat(), to_date.isoformat()]
-        if len(tags) > 0:
-            stmt = stmt + stmt_tag
-            values = values + tags + [len(tags)]
+        if len(users) > 0:
+            stmt = stmt + stmt_user
+            values = values + users + [len(users)]
         cursor.execute(stmt, values)
         return [self.load(raw_uuid=r[0]) for r in cursor.fetchall()]
 
-    def tag_count(self):
+    def user_count(self):
         cursor = self.connect.cursor()
-        stmt = "SELECT tag, COUNT(uuid) FROM tag GROUP BY tag"
+        stmt = "SELECT user, COUNT(uuid) FROM user GROUP BY user"
         cursor.execute(stmt)
         return [{'title': r[0], 'count': r[1]} for r in cursor.fetchall()]
 
@@ -123,7 +124,7 @@ class EdmsSqlite(database.EdmsDatabase):
         cursor = self.connect.cursor()
         sqlite_uuid = sqlite3.Binary(doc.uuid.bytes)
         cursor.execute("DELETE FROM document WHERE uuid = ?", (sqlite_uuid,))
-        cursor.execute("DELETE FROM tag WHERE uuid = ?", (sqlite_uuid,))
+        cursor.execute("DELETE FROM user WHERE uuid = ?", (sqlite_uuid,))
         self.connect.commit()
 
     def update_db(self):
@@ -147,7 +148,7 @@ class EdmsSqlite(database.EdmsDatabase):
                 state TEXT,
                 is_public TEXT)
             """)
-            cursor.execute("CREATE TABLE tag(uuid BLOB, tag TEXT, PRIMARY KEY (uuid, tag))")
+            cursor.execute("CREATE TABLE user(uuid BLOB, user TEXT, PRIMARY KEY (uuid, user))")
         if old_version < 2:
             cursor.executescript("""
                 BEGIN TRANSACTION;

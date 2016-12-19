@@ -29,11 +29,11 @@ class EdmsDatabase(object):
         pass
 
     @virtual
-    def search(self, tags, from_date, to_date):
+    def search(self, users, from_date, to_date):
         pass
 
     @virtual
-    def tag_count(self):
+    def user_count(self):
         pass
 
     @virtual

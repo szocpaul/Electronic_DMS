@@ -19,7 +19,7 @@ def main():
             "description": doc.description,
             "state": doc.state,
             "is_public": doc.is_public,
-            "tags": list(doc.tags)
+            "users": list(doc.users)
         })
     print(json.dumps(res))
 

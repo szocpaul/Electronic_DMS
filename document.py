@@ -14,7 +14,7 @@ class Document(object):
                  description="",
                  state="new",
                  is_public="",
-                 tags=set(),
+                 users=set(),
                  in_database=False):
         if uuid is None:
             self.uuid = uuid_lib.uuid4()
@@ -33,11 +33,11 @@ class Document(object):
         self.description = description
         self.state = state
         self.is_public = is_public
-        self.tags = tags
+        self.users = users
         self.in_database = in_database
 
-    def add_tag(self, tag):
-        self.tags.add(tag)
+    def add_user(self, user):
+        self.users.add(user)
 
-    def remove_tag(self, tag):
-        self.tags.remove(tag)
+    def remove_user(self, user):
+        self.users.remove(user)

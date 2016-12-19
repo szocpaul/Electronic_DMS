@@ -3,8 +3,8 @@
 <form method="get" action="{{ url_for('search') }}" class="searchform">
     <div class="form-group row">
         <div class="col-md-12">
-            <label for="tags">Search</label>
-            <input type="text" id="tags" name="tags" value="{{ search_tags }}" class="search form-control">
+            <label for="users">Search</label>
+            <input type="text" id="users" name="users" value="{{ search_users }}" class="search form-control">
         </div>
     </div>
     <div class="form-group row">
@@ -29,7 +29,7 @@
 <ul>
     <li><a href="{{ url_for('create') }}">Create new repository</a></li>
     <li><a href="{{ url_for('repo_count') }}">Get repository overview</a></li>
-    <li><a href="{{ url_for('tagoverview') }}">Get tags overview</a></li>
+    <li><a href="{{ url_for('useroverview') }}">Get users overview</a></li>
 </ul>
 {% endblock %}
 {% endblock %}

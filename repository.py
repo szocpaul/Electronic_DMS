@@ -40,6 +40,9 @@ class Repository(object):
     def get_dir(self, uuid, documents="documents"):
         return self.base + "/" + str(uuid) + "/" + documents + "/"
 
+    def get_dir_users(self, uuid, users="users"):
+        return self.base + "/" + str(uuid) + "/" + users + "/"
+
     def load(self, uuid, file_path):
         """Try to load an existing repository"""
         directory = self.get_dir(uuid, documents="documents")
@@ -70,8 +73,8 @@ class Repository(object):
             return None
         return [prefix + r for r in result]
 
-    def remove(self, uuid):
-        full = self.get_dir(uuid)
+    def remove(self, uuid, file):
+        full = self.get_dir(uuid, documents="documents") + file
         try:
             os.remove(full)
         except OSError:

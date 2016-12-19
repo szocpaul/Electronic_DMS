@@ -13,11 +13,12 @@ from logging.handlers import RotatingFileHandler
 
 app = Flask(__name__)
 
-log_handler = RotatingFileHandler('logs/edms.log', maxBytes=1000000l, backupCount=3)
+log_handler = RotatingFileHandler('logs/edms.log', maxBytes=1000000, backupCount=3)
 log_handler.setLevel(logging.WARNING)
 log_formatter = logging.Formatter("%(asctime)s - %(levelname)s\n%(message)s")
 log_handler.setFormatter(log_formatter)
 app.logger.addHandler(log_handler)
+
 
 def get_db():
     configuration = config.parse('config.toml')
@@ -39,7 +40,7 @@ def search():
         example: from (01-02-2013) to (2013, 1, 2)"""
     db, _ = get_db()
 
-    tags = [tag for tag in flask.request.args.get('tags').split(' ') if tag != '']
+    users = [user for user in flask.request.args.get('users').split(' ') if user != '']
     to_raw = flask.request.args.get('to', '')
     from_raw = flask.request.args.get('from', '')
 
@@ -56,8 +57,8 @@ def search():
         except ValueError:
             pass
 
-    results = db.search(tags, from_date, to_date)
-    search_tags = ' '.join(tags)
+    results = db.search(users, from_date, to_date)
+    search_users = ' '.join(users)
 
     if from_date == datetime.date.min:
         search_from = ''
@@ -68,7 +69,7 @@ def search():
     else:
         search_to = str(to_date)
 
-    return flask.render_template("search.html", results=results, search_tags=search_tags, search_from=search_from,
+    return flask.render_template("search.html", results=results, search_users=search_users, search_from=search_from,
                                  search_to=search_to)
 
 
@@ -159,13 +160,13 @@ def save(uuid):
         doc.state = form['state']
         doc.is_public = form['is_public']
         db.save(doc)
-    if 'deltag' in form and 'tag' in form:
-        tag = form['tag']
-        doc.remove_tag(tag)
+    if 'deluser' in form and 'user' in form:
+        user = form['user']
+        doc.remove_user(user)
         db.save(doc)
-    if 'addtag' in form and 'tag' in form:
-        for tag in form['tag'].split():
-            doc.add_tag(tag)
+    if 'adduser' in form and 'user' in form:
+        for user in form['user'].split():
+            doc.add_user(user)
         db.save(doc)
     if 'delfile' in form and 'file' in form:
         file = form['file']
@@ -205,11 +206,11 @@ def repo_count():
     return flask.render_template("search.html", results=results)
 
 
-@app.route("/tagoverview")
-def tagoverview():
+@app.route("/useroverview")
+def useroverview():
     db, _ = get_db()
-    tags = db.tag_count()
-    return flask.render_template("tagoverview.html", tags=tags)
+    users = db.user_count()
+    return flask.render_template("useroverview.html", users=users)
 
 
 if __name__ == "__main__":

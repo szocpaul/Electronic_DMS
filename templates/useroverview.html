@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+<div>
+    {% for user in users|sort(attribute='count', reverse=True) %}
+    <a href="{{ url_for('search') }}?users={{ user.title }}" class="btn btn-default btn-inlineblock">{{ user.title }} ({{ user.count }})</a>
+    {% endfor %}
+</div>
+{% endblock %}

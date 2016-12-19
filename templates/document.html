@@ -54,8 +54,8 @@
 </div>
 
 <div>
-    {% for tag in doc.tags|sort %}
-    <a href="{{ url_for('search') }}?tags={{ tag }}" class="btn btn-default btn-inlineblock">{{ tag }}</a>
+    {% for user in doc.users|sort %}
+    <a href="{{ url_for('search') }}?users={{ user }}" class="btn btn-default btn-inlineblock">{{ user }}</a>
     {% endfor %}
 </div>
 

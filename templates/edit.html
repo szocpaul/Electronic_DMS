@@ -50,28 +50,28 @@
     </div>
 </form>
 
-<h2>Tags</h2>
-<p>Click a tag to <strong>delete</strong> it</p>
+<h2>Users</h2>
+<p>Click a user to <strong>delete</strong> it</p>
 <div>
-    {% for tag in doc.tags|sort %}
+    {% for user in doc.users|sort %}
     <div class="btn-inlineblock">
         <form method="post" action="{{ url_for('save', uuid=doc.uuid) }}">
-            <input type="hidden" name="tag" value="{{ tag }}" class="form-control">
-            <button type="submit" name="deltag" class="btn btn-danger">{{ tag }}</button>
+            <input type="hidden" name="user" value="{{ user }}" class="form-control">
+            <button type="submit" name="deluser" class="btn btn-danger">{{ user }}</button>
         </form>
     </div>
     {% endfor %}
 </div>
 
 
-<div class="row"><div class="col-md-4">Add a tag</div></div>
+<div class="row"><div class="col-md-4">Add a user</div></div>
 <form method="post" action="{{ url_for('save', uuid=doc.uuid) }}">
     <div class="row">
         <div class="col-md-4">
-            <input type="text" name="tag" class="form-control">
+            <input type="text" name="user" class="form-control">
         </div>
         <div class="col-md-1">
-            <button type="submit" name="addtag" class="btn btn-success">Add tag</button>
+            <button type="submit" name="adduser" class="btn btn-success">Add user</button>
         </div>
     </div>
 </form>
