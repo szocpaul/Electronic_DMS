@@ -8,9 +8,16 @@ import database
 import repository
 import config
 import werkzeug
+import logging
+from logging.handlers import RotatingFileHandler
 
 app = Flask(__name__)
 
+log_handler = RotatingFileHandler('logs/edms.log', maxBytes=1000000l, backupCount=3)
+log_handler.setLevel(logging.WARNING)
+log_formatter = logging.Formatter("%(asctime)s - %(levelname)s\n%(message)s")
+log_handler.setFormatter(log_formatter)
+app.logger.addHandler(log_handler)
 
 def get_db():
     configuration = config.parse('config.toml')
