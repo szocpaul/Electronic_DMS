@@ -1,5 +1,4 @@
 import sqlite3
-import user
 import document
 import uuid as uuid_lib
 import datetime
@@ -51,8 +50,6 @@ class EdmsSqlite(database.EdmsDatabase):
             cursor.execute(stmt, values)
         except sqlite3.IntegrityError:
             raise database.ExistError()
-
-        cursor.execute("DELETE FROM user WHERE uuid=:uuid", {"uuid": sqlite_uuid})
 
         def user_gen():
             for t in document.users:
@@ -148,7 +145,8 @@ class EdmsSqlite(database.EdmsDatabase):
                 state TEXT,
                 is_public TEXT)
             """)
-            cursor.execute("CREATE TABLE user(uuid BLOB, user TEXT, PRIMARY KEY (uuid, user))")
+            cursor.execute(
+                "CREATE TABLE user(uuid BLOB, user TEXT, first_name TEXT, last_name TEXT, birth_day INT, email_add TEXT, role TEXT, pass_wd TEXT, PRIMARY KEY (uuid, user))")
         if old_version < 2:
             cursor.executescript("""
                 BEGIN TRANSACTION;
@@ -169,7 +167,8 @@ class EdmsSqlite(database.EdmsDatabase):
                 uuid_lob = result[0]
                 creation_date = datetime.date.fromtimestamp(int(result[1])).isoformat()
                 document_date = datetime.date.fromtimestamp(int(result[2])).isoformat()
-                cursor2.execute("UPDATE document SET creation_date = ?, document_date = ? WHERE uuid = ?", (creation_date, document_date, uuid_lob))
+                cursor2.execute("UPDATE document SET creation_date = ?, document_date = ? WHERE uuid = ?",
+                                (creation_date, document_date, uuid_lob))
         cursor.execute("UPDATE config SET value = '2' WHERE key = 'version'")
         self.connect.commit()
 
